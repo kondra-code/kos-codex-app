@@ -1,0 +1,8 @@
+{
+  "kos": {
+    "app": {
+      "appClass": "com.kondra.kos.codex.CodexApplication",
+      "appId": "system"
+    }
+  }
+}
