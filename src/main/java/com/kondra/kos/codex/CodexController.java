@@ -48,7 +48,7 @@ public class CodexController {
      *
      * @param id of item to be removed from the list
      */
-    @ApiEndpoint(DELETE = "/remove/{id}", hidden = true, desc = "remove an item from the list",
+    @ApiEndpoint(DELETE = "/remove/{id}", desc = "remove an item from the list",
             params = @ApiEndpoint.Param(name = "id", desc = "The object id to remove"))
     public void remove(@PathVariable("id")int id) {
         codexBasicService.removeObject(id);
