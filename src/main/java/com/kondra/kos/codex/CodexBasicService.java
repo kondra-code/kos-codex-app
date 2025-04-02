@@ -3,10 +3,12 @@ package com.kondra.kos.codex;
 import com.tccc.kos.commons.core.broker.MessageBroker;
 import com.tccc.kos.commons.core.context.annotations.Autowired;
 import com.tccc.kos.commons.core.service.AbstractConfigurableService;
+import com.tccc.kos.commons.util.concurrent.future.FutureEvent;
+import com.tccc.kos.commons.util.concurrent.future.FutureWork;
+import com.tccc.kos.commons.util.concurrent.future.SequencedFuture;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -47,5 +49,48 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
         }else{
             log.warn("Could not find object with id {}", id);
         }
+    }
+
+    /**
+     *
+     * @param numOfItems int
+     *
+     * @return FutureWork
+     */
+    public FutureWork getAdditionalData(int numOfItems) {
+        SequencedFuture future = new SequencedFuture("sequencedFuture");
+        future.setFailState(null);
+        future.setProgress(0);
+
+        List<TestObject> clientTestObjects = new ArrayList<>();
+        future.getClientData().setData(clientTestObjects);
+
+        future.add(new FutureWork("init", f->{
+            log.info("Adding object {} to the list", numOfItems);
+            f.success();
+        }));
+
+        future.add(new FutureWork("addItems", f -> {
+            for(int i = 1; i <= numOfItems; i++){
+                TestObject testObject = new TestObject();
+                int id =  Math.abs(new Random().nextInt());
+                testObject.setId(id);
+                testObject.setDesc("desc " + id);
+
+                clientTestObjects.add(testObject);
+                testObjects.put(testObject.getId(), testObject);
+
+                future.setProgress((i*100)/numOfItems);
+                Thread.sleep(500);
+            }
+            f.success();
+        }));
+
+        future.append("postProcess", FutureEvent.COMPLETE, f -> {
+            List<TestObject> clientDataRes = (List<TestObject>)f.getClientData().getData();
+            log.info("clientDataRes: {}", clientDataRes);
+        });
+
+        return future;
     }
 }
