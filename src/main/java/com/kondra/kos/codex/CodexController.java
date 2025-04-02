@@ -5,6 +5,7 @@ import com.tccc.kos.commons.core.dispatcher.annotations.ApiController;
 import com.tccc.kos.commons.core.dispatcher.annotations.ApiEndpoint;
 import com.tccc.kos.commons.core.dispatcher.annotations.PathVariable;
 import com.tccc.kos.commons.core.dispatcher.annotations.RequestBody;
+import com.tccc.kos.commons.util.concurrent.future.FutureWork;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
@@ -52,6 +53,18 @@ public class CodexController {
             params = @ApiEndpoint.Param(name = "id", desc = "The object id to remove"))
     public void remove(@PathVariable("id")int id) {
         codexBasicService.removeObject(id);
+    }
+
+    /**
+     *
+     * @param numOfItems number of items to add in list of objects
+     *
+     * @return FutureWork
+     */
+    @ApiEndpoint(GET = "/additional-data/{numOfItems}",desc = "Return the Future Work of Additional Data")
+    public FutureWork getAdditionalData(@PathVariable("numOfItems") int numOfItems){
+        FutureWork futureWork = codexBasicService.getAdditionalData(numOfItems);
+        return futureWork;
     }
 
 }
