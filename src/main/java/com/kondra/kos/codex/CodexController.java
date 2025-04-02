@@ -61,8 +61,8 @@ public class CodexController {
      *
      * @return FutureWork
      */
-    @ApiEndpoint(GET = "/additional-data/{numOfItems}",desc = "Return the Future Work of Additional Data")
-    public FutureWork getAdditionalData(@PathVariable("numOfItems") int numOfItems){
+    @ApiEndpoint(POST = "/additional-data/{numOfItems}",desc = "Return the Future Work of Additional Data")
+    public FutureWork additionalData(@PathVariable("numOfItems") int numOfItems){
         FutureWork futureWork = codexBasicService.getAdditionalData(numOfItems);
         return futureWork;
     }
