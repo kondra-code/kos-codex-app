@@ -4,7 +4,6 @@ import com.tccc.kos.commons.core.context.annotations.Autowired;
 import com.tccc.kos.commons.core.dispatcher.annotations.ApiController;
 import com.tccc.kos.commons.core.dispatcher.annotations.ApiEndpoint;
 import com.tccc.kos.commons.core.dispatcher.annotations.PathVariable;
-import com.tccc.kos.commons.core.dispatcher.annotations.RequestBody;
 import com.tccc.kos.commons.util.concurrent.future.FutureWork;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,51 +17,44 @@ public class CodexController {
     CodexBasicService codexBasicService;
 
     /**
-     *
      * @return endpoint that return a list of objects.
      */
-    @ApiEndpoint(GET = "/list",desc = "Return the list of objects.")
-    public Collection<TestObject> list() {
+    @ApiEndpoint(GET = "/objects", desc = "Return the list of objects.")
+    public Collection<TestObject> getObjects() {
         return codexBasicService.getTestObjects();
     }
 
     /**
-     *
-     * @param testObject Test Object to be Added
+     * Add an item to the list.
      */
-    @ApiEndpoint(POST = "/add", desc = "Add and item to the list")
-    public void add(@RequestBody TestObject testObject) {
-        codexBasicService.addObject(testObject);
-
+    @ApiEndpoint(POST = "/objects", desc = "Add an item to the list")
+    public void addObjects() {
+        codexBasicService.addObject();
     }
 
     /**
-     *
-     * @param testObject Modified Test Object
-     */
-    @ApiEndpoint(PUT = "/modify", desc = "Modify an item from the list")
-    public void modify(@RequestBody TestObject testObject) {
-        codexBasicService.modifyObject(testObject);
-    }
-
-    /**
-     *
      * @param id of item to be removed from the list
      */
-    @ApiEndpoint(DELETE = "/remove/{id}", desc = "remove an item from the list",
+    @ApiEndpoint(PUT = "/objects/{id}", desc = "Modify an item from the list")
+    public void modify(@PathVariable("id") int id) {
+        codexBasicService.modifyObject(id);
+    }
+
+    /**
+     * @param id of item to be removed from the list
+     */
+    @ApiEndpoint(DELETE = "/objects/{id}", desc = "remove an item from the list",
             params = @ApiEndpoint.Param(name = "id", desc = "The object id to remove"))
-    public void remove(@PathVariable("id")int id) {
+    public void remove(@PathVariable("id") int id) {
         codexBasicService.removeObject(id);
     }
 
     /**
-     *
      * @param numOfItems number of items to add in list of objects
-     *
      * @return FutureWork
      */
-    @ApiEndpoint(POST = "/additional-data/{numOfItems}",desc = "Return the Future Work of Additional Data")
-    public FutureWork additionalData(@PathVariable("numOfItems") int numOfItems){
+    @ApiEndpoint(POST = "/objects/additional-data/{numOfItems}", desc = "Return the Future Work of Additional Data")
+    public FutureWork additionalData(@PathVariable("numOfItems") int numOfItems) {
         FutureWork futureWork = codexBasicService.getAdditionalData(numOfItems);
         return futureWork;
     }

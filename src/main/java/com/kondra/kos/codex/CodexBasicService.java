@@ -20,27 +20,53 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
 
     @Autowired
     private MessageBroker messageBroker;
-
     private final Map<Integer, TestObject> testObjects = new ConcurrentHashMap<>();
 
+    /**
+     *
+     * @return Collection<TestObject>
+     */
     public Collection<TestObject> getTestObjects() {
         return testObjects.values();
     }
 
-    public void addObject(TestObject testObject) {
+    /**
+     *
+     */
+    public void addObject() {
+
+        TestObject testObject = new TestObject();
+        int id =  Math.abs(new Random().nextInt());
+        testObject.setId(id);
+        testObject.setDesc("desc " + id);
+
         testObjects.put(testObject.getId(), testObject);
         messageBroker.send(TOPIC_OBJECTS_ADDED, testObject);
 
         log.info("Added object {} to the list", testObject.getId());
     }
 
-    public void modifyObject(TestObject testObject) {
-        testObjects.put(testObject.getId(), testObject);
-        messageBroker.send(TOPIC_OBJECTS_MODIFIED, testObject);
-
-        log.info("Modified object {} from the list", testObject.getId());
+    /**
+     *
+     * @param id int
+     */
+    public void modifyObject(int id) {
+        TestObject testObject = testObjects.get(id);
+        if(testObject != null) {
+            String modifiedDesc = "modified " + testObject.getDesc();
+            testObject.setDesc(modifiedDesc);
+            testObjects.put(testObject.getId(), testObject);
+            messageBroker.send(TOPIC_OBJECTS_MODIFIED, testObject);
+            log.info("Modified object {} from the list", testObject.getId());
+        }else{
+            log.warn("Object not found with id {}, unable to modify", id);
+        }
     }
 
+    /**
+     *
+     * @param id int
+     */
     public void removeObject(int id) {
         TestObject testObject = testObjects.remove(id);
         if(testObject != null) {
