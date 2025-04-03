@@ -14,16 +14,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class CodexBasicService extends AbstractConfigurableService<CodexServiceConfig> {
 
-    private static final String TOPIC_OBJECTS_ADDED = "/objects/added";
-    private static final String TOPIC_OBJECTS_REMOVED = "/objects/removed";
-    private static final String TOPIC_OBJECTS_MODIFIED = "/objects/modified";
+    private static final String TOPIC_OBJECTS = "/codex/objects";
+    private static final String TOPIC_OBJECTS_ADDED = TOPIC_OBJECTS + "/added";
+    private static final String TOPIC_OBJECTS_REMOVED = TOPIC_OBJECTS + "/removed";
+    private static final String TOPIC_OBJECTS_MODIFIED = TOPIC_OBJECTS + "/modified";
 
     @Autowired
     private MessageBroker messageBroker;
     private final Map<Integer, TestObject> testObjects = new ConcurrentHashMap<>();
 
     /**
-     *
      * @return Collection<TestObject>
      */
     public Collection<TestObject> getTestObjects() {
@@ -31,11 +31,10 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
     }
 
     /**
-     *
      * @param testObject TestObject
      */
     public void addObject(TestObject testObject) {
-        int id =  Math.abs(new Random().nextInt());
+        int id = Math.abs(new Random().nextInt());
         testObject.setId(id);
         String desc = testObject.getDesc() + " " + id;
         testObject.setDesc(desc);
@@ -47,40 +46,36 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
     }
 
     /**
-     *
      * @param id int
      */
     public void modifyObject(int id) {
         TestObject testObject = testObjects.get(id);
-        if(testObject != null) {
+        if (testObject != null) {
             String modifiedDesc = "modified " + testObject.getDesc();
             testObject.setDesc(modifiedDesc);
             testObjects.put(testObject.getId(), testObject);
             messageBroker.send(TOPIC_OBJECTS_MODIFIED, testObject);
             log.info("Modified object {} from the list", testObject.getId());
-        }else{
+        } else {
             log.warn("Object not found with id {}, unable to modify", id);
         }
     }
 
     /**
-     *
      * @param id int
      */
     public void removeObject(int id) {
         TestObject testObject = testObjects.remove(id);
-        if(testObject != null) {
+        if (testObject != null) {
             messageBroker.send(TOPIC_OBJECTS_REMOVED, testObject);
             log.info("Removed object {} from the list", id);
-        }else{
+        } else {
             log.warn("Could not find object with id {}", id);
         }
     }
 
     /**
-     *
      * @param numOfItems int
-     *
      * @return FutureWork
      */
     public FutureWork getAdditionalData(int numOfItems) {
@@ -91,29 +86,29 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
         List<TestObject> clientTestObjects = new ArrayList<>();
         future.getClientData().setData(clientTestObjects);
 
-        future.add(new FutureWork("init", f->{
+        future.add(new FutureWork("init", f -> {
             log.info("Adding object {} to the list", numOfItems);
             f.success();
         }));
 
         future.add(new FutureWork("addItems", f -> {
-            for(int i = 1; i <= numOfItems; i++){
+            for (int i = 1; i <= numOfItems; i++) {
                 TestObject testObject = new TestObject();
-                int id =  Math.abs(new Random().nextInt());
+                int id = Math.abs(new Random().nextInt());
                 testObject.setId(id);
                 testObject.setDesc("desc " + id);
 
                 clientTestObjects.add(testObject);
                 testObjects.put(testObject.getId(), testObject);
 
-                future.setProgress((i*100)/numOfItems);
+                future.setProgress((i * 100) / numOfItems);
                 Thread.sleep(500);
             }
             f.success();
         }));
 
         future.append("postProcess", FutureEvent.COMPLETE, f -> {
-            List<TestObject> clientDataRes = (List<TestObject>)f.getClientData().getData();
+            List<TestObject> clientDataRes = (List<TestObject>) f.getClientData().getData();
             log.info("clientDataRes: {}", clientDataRes);
         });
 
