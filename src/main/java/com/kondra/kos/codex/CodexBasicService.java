@@ -32,10 +32,9 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
 
     /**
      *
+     * @param testObject TestObject
      */
-    public void addObject() {
-
-        TestObject testObject = new TestObject();
+    public void addObject(TestObject testObject) {
         int id =  Math.abs(new Random().nextInt());
         testObject.setId(id);
         testObject.setDesc("desc " + id);
