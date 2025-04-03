@@ -37,7 +37,8 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
     public void addObject(TestObject testObject) {
         int id =  Math.abs(new Random().nextInt());
         testObject.setId(id);
-        testObject.setDesc("desc " + id);
+        String desc = testObject.getDesc() + " " + id;
+        testObject.setDesc(desc);
 
         testObjects.put(testObject.getId(), testObject);
         messageBroker.send(TOPIC_OBJECTS_ADDED, testObject);
