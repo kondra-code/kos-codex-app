@@ -4,6 +4,7 @@ import com.tccc.kos.commons.core.context.annotations.Autowired;
 import com.tccc.kos.commons.core.dispatcher.annotations.ApiController;
 import com.tccc.kos.commons.core.dispatcher.annotations.ApiEndpoint;
 import com.tccc.kos.commons.core.dispatcher.annotations.PathVariable;
+import com.tccc.kos.commons.core.dispatcher.annotations.RequestBody;
 import com.tccc.kos.commons.util.concurrent.future.FutureWork;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,8 +29,8 @@ public class CodexController {
      * Add an item to the list.
      */
     @ApiEndpoint(POST = "/objects", desc = "Add an item to the list")
-    public void addObjects() {
-        codexBasicService.addObject();
+    public void addObjects(@RequestBody TestObject testObject) {
+        codexBasicService.addObject(testObject);
     }
 
     /**
