@@ -3,6 +3,7 @@ package com.kondra.kos.codex;
 import com.tccc.kos.commons.core.broker.MessageBroker;
 import com.tccc.kos.commons.core.context.annotations.Autowired;
 import com.tccc.kos.commons.core.service.AbstractConfigurableService;
+import com.tccc.kos.commons.core.service.trouble.TroubleService;
 import com.tccc.kos.commons.util.concurrent.future.FutureEvent;
 import com.tccc.kos.commons.util.concurrent.future.FutureWork;
 import com.tccc.kos.commons.util.concurrent.future.SequencedFuture;
@@ -21,6 +22,8 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
 
     @Autowired
     private MessageBroker messageBroker;
+    @Autowired
+    private TroubleService troubleService;
     private final Map<Integer, TestObject> testObjects = new ConcurrentHashMap<>();
 
     /**
@@ -34,15 +37,21 @@ public class CodexBasicService extends AbstractConfigurableService<CodexServiceC
      * @param testObject TestObject
      */
     public void addObject(TestObject testObject) {
-        int id = Math.abs(new Random().nextInt());
-        testObject.setId(id);
-        String desc = testObject.getDesc() + " " + id;
-        testObject.setDesc(desc);
+        String desc = testObject.getDesc();
+        if (!desc.isEmpty()) {
+            int id = Math.abs(new Random().nextInt());
+            testObject.setId(id);
+            testObject.setDesc(desc + " " + id);
 
-        testObjects.put(testObject.getId(), testObject);
-        messageBroker.send(TOPIC_OBJECTS_ADDED, testObject);
+            testObjects.put(testObject.getId(), testObject);
+            messageBroker.send(TOPIC_OBJECTS_ADDED, testObject);
 
-        log.info("Added object {} to the list", testObject.getId());
+            log.info("Added object {} to the list", testObject.getId());
+        } else {
+            log.warn("Description is empty");
+            troubleService.removeLinked(this);
+            troubleService.add(new EmptyDescTrouble(this));
+        }
     }
 
     /**
