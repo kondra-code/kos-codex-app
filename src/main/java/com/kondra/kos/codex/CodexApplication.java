@@ -1,5 +1,7 @@
 package com.kondra.kos.codex;
 
+import java.awt.Desktop;
+
 import com.tccc.kos.commons.core.context.annotations.Autowired;
 import com.tccc.kos.commons.core.vfs.VFSSource;
 import com.tccc.kos.commons.kab.KabFile;
@@ -8,6 +10,7 @@ import com.tccc.kos.core.service.app.SystemApplication;
 import com.tccc.kos.core.service.browser.BrowserService;
 import com.tccc.kos.core.service.region.XmlRegionFactory;
 import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
 
 @Slf4j
 public class CodexApplication extends SystemApplication<CodexAppConfig> {
@@ -39,7 +42,7 @@ public class CodexApplication extends SystemApplication<CodexAppConfig> {
         KabFile codexUiKab = getSection().getKabByType(KABTYPE_CODEXUI);
         if (codexUiKab != null) {
             VFSSource source = getVfs().mount(MOUNTPOINT_CODEXUI, codexUiKab);
-            codexUrl = source.getFullPath("index.html");
+            codexUrl = source.getFullPath("browser.html");
         } else {
             log.error("No codexUi KAB found");
         }
@@ -47,7 +50,7 @@ public class CodexApplication extends SystemApplication<CodexAppConfig> {
 
     @Override
     public void started() throws Exception {
-        if (codexUrl != null) {
+         if (codexUrl != null) {
             browserService.goToUrl(codexUrl);
         }
     }
