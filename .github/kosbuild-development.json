@@ -1,0 +1,12 @@
+{
+  "default_keyset": "prod.kos",
+  "build_cmd": "./quickbuild.sh",
+  "artifacts": [
+    {
+      "id": "kosdev-codex-app",
+      "filename": "target/kos-codex-app-${KOS_STD_VERSION_REGEX}.kab",
+      "artifactstore": "kos-cdn",
+      "marketplace": 1
+    }
+  ]
+}
